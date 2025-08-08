@@ -19,11 +19,13 @@
     }
 
     .top-bar {
-      position: fixed;
-      top: 160px;
+      position: sticky;
+      top: 130px;
       width: 100%;
-      z-index: 999;
+      z-index: 1000;
       text-align: center;
+      padding-bottom: 10px;
+      background: rgba(0, 0, 0, 0.0);
     }
 
     .filter-buttons {
@@ -60,7 +62,7 @@
 
     .content {
       position: absolute;
-      top: 260px;
+      top: 220px;
       bottom: 0;
       left: 0;
       right: 0;
@@ -70,16 +72,15 @@
     }
 
     #song-list {
-      font-family: monospace;
-      white-space: pre;
-      text-align: center;
+      font-family: Arial, sans-serif;
     }
 
     .line {
       display: flex;
       justify-content: center;
+      align-items: center;
       font-size: 1em;
-      padding: 2px 0;
+      padding: 3px 0;
     }
 
     .left {
@@ -89,10 +90,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-
-    .separator {
-      width: 20px;
     }
 
     .right {
@@ -155,7 +152,6 @@
         line.className = 'line';
         line.innerHTML = `
           <div class="left">${song.uitvoerder}</div>
-          <div class="separator">-</div>
           <div class="right">${song.titel}</div>
         `;
         list.appendChild(line);
