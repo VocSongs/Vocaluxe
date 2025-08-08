@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vocaluxe Zanglijst</title>
+  <title>Vocaluxe Songs</title>
   <style>
     html, body {
       margin: 0;
@@ -73,14 +73,19 @@
 
     #song-list {
       font-family: Arial, sans-serif;
+      background: rgba(0, 0, 0, 0.5);
+      margin: 0 auto;
+      max-width: 900px;
+      border-radius: 10px;
+      padding: 10px 0;
     }
 
     .line {
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 1em;
-      padding: 3px 0;
+      font-size: 1.15em;
+      padding: 4px 0;
     }
 
     .left {
@@ -104,7 +109,7 @@
     @media (max-width: 600px) {
       .left, .right {
         width: 45%;
-        font-size: 0.9em;
+        font-size: 1em;
       }
     }
   </style>
