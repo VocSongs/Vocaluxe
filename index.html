@@ -20,7 +20,7 @@
 
     .top-bar {
       position: sticky;
-      top: 200px;
+      top: 150px;
       width: 100%;
       z-index: 1000;
       text-align: center;
@@ -62,7 +62,7 @@
 
     .content {
       position: absolute;
-      top: 270px;
+      top: 240px;
       bottom: 0;
       left: 0;
       right: 0;
@@ -130,18 +130,37 @@
   <script>
     let allSongs = [];
 
+    function normKeyMap(obj) {
+      // Maak keymap in lower-case zonder spaties
+      const m = {};
+      for (const [k, v] of Object.entries(obj)) {
+        if (!k) continue;
+        m[k.trim().toLowerCase()] = v;
+      }
+      return m;
+    }
+
+    function pick(obj, candidates) {
+      for (const c of candidates) {
+        if (obj[c] != null && String(obj[c]).trim() !== "") return String(obj[c]).trim();
+      }
+      return "";
+    }
+
     function loadSongs() {
       Papa.parse("songs.csv", {
         download: true,
         header: true,
-        skipEmptyLines: true,
+        skipEmptyLines: 'greedy',   // verwijder ook regels die alleen whitespace bevatten
         complete: function(results) {
           allSongs = results.data
-            .filter(song => song.Uitvoerder?.trim() && song.Titel?.trim())
-            .map(song => ({
-              uitvoerder: song.Uitvoerder.trim(),
-              titel: song.Titel.trim()
-            }));
+            .map(row => {
+              const m = normKeyMap(row);
+              const uitvoerder = pick(m, ['uitvoerder', 'artist', 'artiest', 'performer']);
+              const titel = pick(m, ['titel', 'title', 'song', 'nummer']);
+              return { uitvoerder, titel };
+            })
+            .filter(s => s.uitvoerder && s.titel);
           displaySongs(allSongs);
         },
         error: function(err) {
