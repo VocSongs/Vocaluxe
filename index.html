@@ -20,7 +20,7 @@
 
     .top-bar {
       position: sticky;
-      top: 130px;
+      top: 150px;
       width: 100%;
       z-index: 1000;
       text-align: center;
@@ -62,7 +62,7 @@
 
     .content {
       position: absolute;
-      top: 220px;
+      top: 240px;
       bottom: 0;
       left: 0;
       right: 0;
@@ -73,7 +73,8 @@
 
     #song-list {
       font-family: Arial, sans-serif;
-      background: rgba(0, 0, 0, 0.6); box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
       margin: 0 auto;
       max-width: 900px;
       border-radius: 10px;
@@ -135,18 +136,13 @@
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
-          
-    allSongs = results.data
-      .filter(song => song.Uitvoerder?.trim() && song.Titel?.trim())
-      .map(song => ({
-    
-            uitvoerder: song.Uitvoerder?.trim() || "",
-            titel: song.Titel?.trim() || ""
-          }));
-          
-    allSongs = allSongs.filter(song => song.uitvoerder && song.titel);
-    displaySongs(allSongs);
-    
+          allSongs = results.data
+            .filter(song => song.Uitvoerder?.trim() && song.Titel?.trim())
+            .map(song => ({
+              uitvoerder: song.Uitvoerder.trim(),
+              titel: song.Titel.trim()
+            }));
+          displaySongs(allSongs);
         },
         error: function(err) {
           document.getElementById('song-list').textContent = "Fout bij laden van songs.csv: " + err.message;
@@ -173,10 +169,7 @@
     function filterByLetter(letter) {
       document.getElementById('search').value = '';
       if (letter === 'Alles') {
-        
-    allSongs = allSongs.filter(song => song.uitvoerder && song.titel);
-    displaySongs(allSongs);
-    
+        displaySongs(allSongs);
       } else if (letter === '#') {
         displaySongs(allSongs.filter(song => !/^[a-zA-Z]/.test(song.uitvoerder)));
       } else {
