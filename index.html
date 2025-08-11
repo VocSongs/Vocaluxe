@@ -156,7 +156,7 @@
   <!-- Fixed meta info bar (centred container) -->
   <div class="top-meta">
     <div class="meta-wrap">
-      <div id="last-update" class="left">Laatst bijgewerkt: —</div>
+      <div id="last-update" class="left">Update: —</div>
       <div id="song-count" class="right">— liedjes</div>
     </div>
   </div>
@@ -198,8 +198,7 @@
     function formatNLDate(d) {
       try {
         return new Intl.DateTimeFormat('nl-BE', {
-          day: '2-digit', month: 'long', year: 'numeric',
-          hour: '2-digit', minute: '2-digit'
+          day: '2-digit', month: '2-digit', year: 'numeric'
         }).format(d);
       } catch {
         return d.toLocaleString();
@@ -210,7 +209,7 @@
       const total = totalCount.toLocaleString('nl-BE');
       const shown = displayed.toLocaleString('nl-BE');
       const dateStr = lastLoaded ? formatNLDate(lastLoaded) : '—';
-      document.getElementById('last-update').textContent = `Laatst bijgewerkt: ${dateStr}`;
+      document.getElementById('last-update').textContent = `Update: ${dateStr}`;
       document.getElementById('song-count').textContent =
         (displayed !== totalCount) ? `${total} liedjes — ${shown} getoond` : `${total} liedjes`;
     }
