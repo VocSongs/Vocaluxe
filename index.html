@@ -18,6 +18,25 @@
       overflow: hidden;
     }
 
+    /* Top meta bar */
+    .top-meta {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 14px;
+      background: rgba(0, 0, 0, 0.6);
+      font-size: 0.95em;
+      z-index: 2000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+    .top-meta .left { text-align: left; }
+    .top-meta .right { text-align: right; }
+
+    /* Controls (letters + search), remain sticky where user wanted them */
     .top-bar {
       position: sticky;
       top: 150px;
@@ -26,6 +45,15 @@
       text-align: center;
       padding-bottom: 10px;
       background: rgba(0, 0, 0, 0.0);
+    }
+
+    .filter-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
     }
 
     .filter-buttons {
@@ -53,13 +81,13 @@
     #search {
       padding: 10px;
       font-size: 1em;
-      width: 90%;
-      max-width: 400px;
+      width: min(90%, 420px);
       border-radius: 5px;
       border: none;
-      margin-bottom: 10px;
+      margin: 6px 0 0;
     }
 
+    /* Scroll area for the song list */
     .content {
       position: absolute;
       top: 240px;
@@ -89,7 +117,7 @@
       padding: 4px 0;
     }
 
-    .left {
+    .left-col {
       width: 40%;
       text-align: right;
       padding-right: 10px;
@@ -98,7 +126,7 @@
       white-space: nowrap;
     }
 
-    .right {
+    .right-col {
       width: 40%;
       text-align: left;
       padding-left: 10px;
@@ -108,30 +136,43 @@
     }
 
     @media (max-width: 600px) {
-      .left, .right {
+      .left-col, .right-col {
         width: 45%;
         font-size: 1em;
       }
+      #search { width: 92%; }
+      .top-meta { font-size: 0.9em; padding: 6px 10px; }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
 
-  <div class="top-bar">
-    <div class="filter-buttons" id="buttons"></div>
-    <input type="text" id="search" placeholder="Zoek op uitvoerder of titel..." />
+  <!-- Fixed meta info bar -->
+  <div class="top-meta">
+    <div id="last-update" class="left">Laatst bijgewerkt: —</div>
+    <div id="song-count" class="right">— liedjes</div>
   </div>
 
+  <!-- Controls -->
+  <div class="top-bar">
+    <div class="filter-buttons" id="buttons"></div>
+    <div class="filter-row">
+      <input type="text" id="search" placeholder="Zoek op uitvoerder of titel..." />
+    </div>
+  </div>
+
+  <!-- Scrollable list -->
   <div class="content">
-    <div id="song-list"></div>
+    <div id="song-list">Laden...</div>
   </div>
 
   <script>
     let allSongs = [];
+    let totalCount = 0;
+    let lastLoaded = null;
 
     function normKeyMap(obj) {
-      // Maak keymap in lower-case zonder spaties
       const m = {};
       for (const [k, v] of Object.entries(obj)) {
         if (!k) continue;
@@ -147,12 +188,34 @@
       return "";
     }
 
-    function loadSongs() {
-      Papa.parse("songs.csv", {
+    function formatNLDate(d) {
+      try {
+        return new Intl.DateTimeFormat('nl-BE', {
+          day: '2-digit', month: 'long', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        }).format(d);
+      } catch {
+        return d.toLocaleString();
+      }
+    }
+
+    function updateMetaInfo(displayed) {
+      const total = totalCount.toLocaleString('nl-BE');
+      const shown = displayed.toLocaleString('nl-BE');
+      const dateStr = lastLoaded ? formatNLDate(lastLoaded) : '—';
+      document.getElementById('last-update').textContent = `Laatst bijgewerkt: ${dateStr}`;
+      document.getElementById('song-count').textContent =
+        (displayed !== totalCount) ? `${total} liedjes — ${shown} getoond` : `${total} liedjes`;
+    }
+
+    function loadSongs(cacheBust = true) {
+      const url = cacheBust ? `songs.csv?ts=${Date.now()}` : "songs.csv";
+      Papa.parse(url, {
         download: true,
         header: true,
-        skipEmptyLines: 'greedy',   // verwijder ook regels die alleen whitespace bevatten
+        skipEmptyLines: 'greedy',
         complete: function(results) {
+          lastLoaded = new Date();
           allSongs = results.data
             .map(row => {
               const m = normKeyMap(row);
@@ -161,6 +224,7 @@
               return { uitvoerder, titel };
             })
             .filter(s => s.uitvoerder && s.titel);
+          totalCount = allSongs.length;
           displaySongs(allSongs);
         },
         error: function(err) {
@@ -173,16 +237,19 @@
     function displaySongs(songs) {
       const list = document.getElementById('song-list');
       list.innerHTML = "";
-      const sorted = songs.sort((a, b) => a.uitvoerder.localeCompare(b.uitvoerder));
+      const sorted = songs.slice().sort((a, b) => a.uitvoerder.localeCompare(b.uitvoerder));
+
       sorted.forEach(song => {
         const line = document.createElement('div');
         line.className = 'line';
         line.innerHTML = `
-          <div class="left">${song.uitvoerder}</div>
-          <div class="right">${song.titel}</div>
+          <div class="left-col">${song.uitvoerder}</div>
+          <div class="right-col">${song.titel}</div>
         `;
         list.appendChild(line);
       });
+
+      updateMetaInfo(sorted.length);
     }
 
     function filterByLetter(letter) {
@@ -197,6 +264,10 @@
     }
 
     function searchSongs(term) {
+      if (!term) {
+        displaySongs(allSongs);
+        return;
+      }
       const t = term.toLowerCase();
       const filtered = allSongs.filter(song =>
         song.uitvoerder.toLowerCase().includes(t) || song.titel.toLowerCase().includes(t)
@@ -220,7 +291,12 @@
     });
 
     setupButtons();
-    loadSongs();
+    loadSongs(true);
+
+    // Auto-reload CSV when tab gets focus (useful after GitHub upload)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) loadSongs(true);
+    });
   </script>
 </body>
 </html>
