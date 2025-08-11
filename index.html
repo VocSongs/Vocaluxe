@@ -203,9 +203,9 @@
       const total = totalCount.toLocaleString('nl-BE');
       const shown = displayed.toLocaleString('nl-BE');
       const dateStr = lastLoaded ? formatNLDate(lastLoaded) : '—';
-      document.getElementById('last-update').textContent = `Laatst bijgewerkt: ${dateStr}`;
+      document.getElementById('last-update').textContent = `   Update: ${dateStr}`;
       document.getElementById('song-count').textContent =
-        (displayed !== totalCount) ? `${total} liedjes — ${shown} getoond` : `${total} liedjes`;
+        (displayed !== totalCount) ? `${total} liedjes — ${shown} getoond     ` : `${total} liedjes     `;
     }
 
     function loadSongs(cacheBust = true) {
