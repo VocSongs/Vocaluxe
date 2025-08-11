@@ -18,25 +18,30 @@
       overflow: hidden;
     }
 
-    /* Top meta bar */
+    /* Top meta bar (gecentreerd via inner container) */
     .top-meta {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 2000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+    .top-meta .meta-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 14px;
-      background: rgba(0, 0, 0, 0.6);
+      gap: 12px;
+      padding: 6px 16px;
       font-size: 0.95em;
-      z-index: 2000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
     }
     .top-meta .left { text-align: left; }
     .top-meta .right { text-align: right; }
 
-    /* Controls (letters + search), remain sticky where user wanted them */
+    /* Controls (letters + search), blijven sticky */
     .top-bar {
       position: sticky;
       top: 150px;
@@ -87,7 +92,7 @@
       margin: 6px 0 0;
     }
 
-    /* Scroll area for the song list */
+    /* Scrollbare lijst */
     .content {
       position: absolute;
       top: 240px;
@@ -141,17 +146,19 @@
         font-size: 1em;
       }
       #search { width: 92%; }
-      .top-meta { font-size: 0.9em; padding: 6px 10px; }
+      .top-meta .meta-wrap { padding: 6px 10px; font-size: 0.9em; }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
 
-  <!-- Fixed meta info bar -->
+  <!-- Fixed meta info bar (centred container) -->
   <div class="top-meta">
-    <div id="last-update" class="left">   Update: —</div>
-    <div id="song-count" class="right">— liedjes   </div>
+    <div class="meta-wrap">
+      <div id="last-update" class="left">Laatst bijgewerkt: —</div>
+      <div id="song-count" class="right">— liedjes</div>
+    </div>
   </div>
 
   <!-- Controls -->
@@ -203,9 +210,9 @@
       const total = totalCount.toLocaleString('nl-BE');
       const shown = displayed.toLocaleString('nl-BE');
       const dateStr = lastLoaded ? formatNLDate(lastLoaded) : '—';
-      document.getElementById('last-update').textContent = `   Update: ${dateStr}`;
+      document.getElementById('last-update').textContent = `Laatst bijgewerkt: ${dateStr}`;
       document.getElementById('song-count').textContent =
-        (displayed !== totalCount) ? `${total} liedjes — ${shown} getoond     ` : `${total} liedjes     `;
+        (displayed !== totalCount) ? `${total} liedjes — ${shown} getoond` : `${total} liedjes`;
     }
 
     function loadSongs(cacheBust = true) {
@@ -250,6 +257,10 @@
       });
 
       updateMetaInfo(sorted.length);
+
+      // Scroll de lijst terug naar boven na elke update
+      const scroller = document.querySelector('.content');
+      if (scroller) scroller.scrollTo({ top: 0, behavior: 'auto' });
     }
 
     function filterByLetter(letter) {
@@ -293,7 +304,7 @@
     setupButtons();
     loadSongs(true);
 
-    // Auto-reload CSV when tab gets focus (useful after GitHub upload)
+    // Auto-reload CSV wanneer tab focus krijgt
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) loadSongs(true);
     });
