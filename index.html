@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Vocaluxe Songs</title>
   <style>
+    :root {
+      --list-font: 1.15em; /* base desktop size, adjustable via A-/A+ */
+    }
+
     html, body {
       margin: 0;
       padding: 0;
@@ -18,15 +22,15 @@
       overflow: hidden;
     }
 
-    /* Top meta bar (gecentreerd via inner container) */
+    /* Top meta bar (centred container) */
     .top-meta {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      background: rgba(0, 0, 0, 0);
+      background: rgba(0, 0, 0, 0.6);
       z-index: 2000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
     }
     .top-meta .meta-wrap {
       max-width: 1100px;
@@ -41,7 +45,7 @@
     .top-meta .left { text-align: left; }
     .top-meta .right { text-align: right; }
 
-    /* Controls (letters + search), blijven sticky */
+    /* Controls (letters + search), sticky */
     .top-bar {
       position: sticky;
       top: 150px;
@@ -92,7 +96,24 @@
       margin: 6px 0 0;
     }
 
-    /* Scrollbare lijst */
+    /* A-/A+ controls (mobile visible) */
+    .font-controls {
+      display: none;
+      gap: 6px;
+    }
+    .font-btn {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: rgba(0,0,0,0.6);
+      color: white;
+      cursor: pointer;
+      font-size: 1em;
+      line-height: 1;
+    }
+    .font-btn:active { transform: translateY(1px); }
+
+    /* Scrollable list area */
     .content {
       position: absolute;
       top: 240px;
@@ -118,7 +139,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 1.15em;
+      font-size: var(--list-font);
       padding: 4px 0;
     }
 
@@ -140,13 +161,18 @@
       white-space: nowrap;
     }
 
+    /* MOBILE LAYOUT */
     @media (max-width: 600px) {
-      .left-col, .right-col {
-        width: 45%;
-        font-size: 1em;
-      }
-      #search { width: 92%; }
+      /* Hide the A–Z buttons on mobile */
+      .filter-buttons { display: none; }
+
+      /* Compact spacing / fonts */
       .top-meta .meta-wrap { padding: 6px 10px; font-size: 0.9em; }
+      #search { width: 92%; }
+      :root { --list-font: 0.95em; }
+
+      /* Show font controls on mobile */
+      .font-controls { display: flex; }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -166,6 +192,10 @@
     <div class="filter-buttons" id="buttons"></div>
     <div class="filter-row">
       <input type="text" id="search" placeholder="Zoek op uitvoerder of titel..." />
+      <div class="font-controls" aria-label="Lettergrootte">
+        <button id="font-dec" class="font-btn" title="Kleiner">A−</button>
+        <button id="font-inc" class="font-btn" title="Groter">A+</button>
+      </div>
     </div>
   </div>
 
@@ -178,6 +208,7 @@
     let allSongs = [];
     let totalCount = 0;
     let lastLoaded = null;
+    let fontSizeEm = 1.15; // desktop base; mobile overrides with CSS var
 
     function normKeyMap(obj) {
       const m = {};
@@ -201,7 +232,7 @@
           day: '2-digit', month: '2-digit', year: 'numeric'
         }).format(d);
       } catch {
-        return d.toLocaleString();
+        return d.toLocaleDateString('nl-BE');
       }
     }
 
@@ -296,6 +327,20 @@
       });
     }
 
+    // Font size controls (mobile-visible)
+    function applyFontSize() {
+      document.documentElement.style.setProperty('--list-font', fontSizeEm + 'em');
+    }
+    document.addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'font-dec') {
+        fontSizeEm = Math.max(0.85, (Math.round((fontSizeEm - 0.05) * 100) / 100));
+        applyFontSize();
+      } else if (e.target && e.target.id === 'font-inc') {
+        fontSizeEm = Math.min(1.40, (Math.round((fontSizeEm + 0.05) * 100) / 100));
+        applyFontSize();
+      }
+    });
+
     document.getElementById('search').addEventListener('input', (e) => {
       searchSongs(e.target.value);
     });
@@ -303,10 +348,13 @@
     setupButtons();
     loadSongs(true);
 
-    // Auto-reload CSV wanneer tab focus krijgt
+    // Auto-reload CSV when tab gets focus (useful after GitHub upload)
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) loadSongs(true);
     });
+
+    // Initialize font var to current value
+    applyFontSize();
   </script>
 </body>
 </html>
