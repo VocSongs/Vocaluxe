@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vocaluxe Songs</title>
+  <style>
+    :root {
+      --list-font: 1.15em; /* base desktop size, adjustable via A-/A+ */
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      color: white;
+      height: 100%;
+      background: url('SiteBG.png') no-repeat center top;
+      background-size: cover;
+      background-attachment: fixed;
+      overflow: hidden;
+    }
+
+    /* Top meta bar (centred container) */
+    .top-meta {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 2000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+    .top-meta .meta-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 16px;
+      font-size: 0.95em;
+    }
+    .top-meta .left { text-align: left; }
+    .top-meta .right { text-align: right; }
+
+    /* Controls (letters + search), sticky */
+    .top-bar {
+      position: sticky;
+      top: 150px;
+      width: 100%;
+      z-index: 1000;
+      text-align: center;
+      padding-bottom: 10px;
+      background: rgba(0, 0, 0, 0.0);
+    }
+
+    .filter-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .filter-buttons button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: rgba(0,0,0,0.6);
+      color: white;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    .filter-buttons button:hover {
+      background-color: rgba(255,255,255,0.2);
+    }
+
+    #search {
+      padding: 10px;
+      font-size: 1em;
+      width: min(90%, 420px);
+      border-radius: 5px;
+      border: none;
+      margin: 6px 0 0;
+    }
+
+    /* A-/A+ controls (mobile visible) */
+    .font-controls {
+      display: none;
+      gap: 6px;
+    }
+    .font-btn {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: rgba(0,0,0,0.6);
+      color: white;
+      cursor: pointer;
+      font-size: 1em;
+      line-height: 1;
+    }
+    .font-btn:active { transform: translateY(1px); }
+
+    /* Scrollable list area */
+    .content {
+      position: absolute;
+      top: 240px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      padding: 10px 0 20px;
+      text-align: center;
+    }
+
+    #song-list {
+      font-family: Arial, sans-serif;
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      margin: 0 auto;
+      max-width: 900px;
+      border-radius: 10px;
+      padding: 10px 0;
+    }
+
+    .line {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: var(--list-font);
+      padding: 4px 0;
+    }
+
+    .left-col {
+      width: 40%;
+      text-align: right;
+      padding-right: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .right-col {
+      width: 40%;
+      text-align: left;
+      padding-left: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* MOBILE LAYOUT */
+    @media (max-width: 600px) {
+      /* Hide the A–Z buttons on mobile */
+      .filter-buttons { display: none; }
+
+      /* Compact spacing / fonts */
+      .top-meta .meta-wrap { padding: 6px 10px; font-size: 0.9em; }
+      #search { width: 92%; }
+      :root { --list-font: 0.95em; }
+
+      /* Show font controls on mobile */
+      .font-controls { display: flex; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+
+  <!-- Fixed meta info bar (centred container) -->
+  <div class="top-meta">
+    <div class="meta-wrap">
+      <div id="last-update" class="left">Update: —</div>
+      <div id="song-count" class="right">— liedjes</div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="top-bar">
+    <div class="filter-buttons" id="buttons"></div>
+    <div class="filter-row">
+      <input type="text" id="search" placeholder="Zoek op uitvoerder of titel..." />
+      <div class="font-controls" aria-label="Lettergrootte">
+        <button id="font-dec" class="font-btn" title="Kleiner">A−</button>
+        <button id="font-inc" class="font-btn" title="Groter">A+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable list -->
+  <div class="content">
+    <div id="song-list">Laden...</div>
+  </div>
+
+  <script>
+    let allSongs = [];
+    let totalCount = 0;
+    let lastLoaded = null;
+    let fontSizeEm = 1.15; // desktop base; mobile overrides with CSS var
+
+    function normKeyMap(obj) {
+      const m = {};
+      for (const [k, v] of Object.entries(obj)) {
+        if (!k) continue;
+        m[k.trim().toLowerCase()] = v;
+      }
+      return m;
+    }
+
+    function pick(obj, candidates) {
+      for (const c of candidates) {
+        if (obj[c] != null && String(obj[c]).trim() !== "") return String(obj[c]).trim();
+      }
+      return "";
+    }
+
+    function formatNLDate(d) {
+      try {
+        return new Intl.DateTimeFormat('nl-BE', {
+          day: '2-digit', month: '2-digit', year: 'numeric'
+        }).format(d);
+      } catch {
+        return d.toLocaleDateString('nl-BE');
+      }
+    }
+
+    function updateMetaInfo(displayed) {
+      const total = totalCount.toLocaleString('nl-BE');
+      const shown = displayed.toLocaleString('nl-BE');
+      const dateStr = lastLoaded ? formatNLDate(lastLoaded) : '—';
+      document.getElementById('last-update').textContent = `Update: ${dateStr}`;
+      document.getElementById('song-count').textContent =
+        (displayed !== totalCount) ? `${total} liedjes — ${shown} getoond` : `${total} liedjes`;
+    }
+
+    function loadSongs(cacheBust = true) {
+      const url = cacheBust ? `songs.csv?ts=${Date.now()}` : "songs.csv";
+      Papa.parse(url, {
+        download: true,
+        header: true,
+        skipEmptyLines: 'greedy',
+        complete: function(results) {
+          lastLoaded = new Date();
+          allSongs = results.data
+            .map(row => {
+              const m = normKeyMap(row);
+              const uitvoerder = pick(m, ['uitvoerder', 'artist', 'artiest', 'performer']);
+              const titel = pick(m, ['titel', 'title', 'song', 'nummer']);
+              return { uitvoerder, titel };
+            })
+            .filter(s => s.uitvoerder && s.titel);
+          totalCount = allSongs.length;
+          displaySongs(allSongs);
+        },
+        error: function(err) {
+          document.getElementById('song-list').textContent = "Fout bij laden van songs.csv: " + err.message;
+          console.error("CSV Load Error:", err);
+        }
+      });
+    }
+
+    function displaySongs(songs) {
+      const list = document.getElementById('song-list');
+      list.innerHTML = "";
+      const sorted = songs.slice().sort((a, b) => a.uitvoerder.localeCompare(b.uitvoerder));
+
+      sorted.forEach(song => {
+        const line = document.createElement('div');
+        line.className = 'line';
+        line.innerHTML = `
+          <div class="left-col">${song.uitvoerder}</div>
+          <div class="right-col">${song.titel}</div>
+        `;
+        list.appendChild(line);
+      });
+
+      updateMetaInfo(sorted.length);
+
+      // Scroll de lijst terug naar boven na elke update
+      const scroller = document.querySelector('.content');
+      if (scroller) scroller.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    function filterByLetter(letter) {
+      document.getElementById('search').value = '';
+      if (letter === 'Alles') {
+        displaySongs(allSongs);
+      } else if (letter === '#') {
+        displaySongs(allSongs.filter(song => !/^[a-zA-Z]/.test(song.uitvoerder)));
+      } else {
+        displaySongs(allSongs.filter(song => song.uitvoerder.toUpperCase().startsWith(letter)));
+      }
+    }
+
+    function searchSongs(term) {
+      if (!term) {
+        displaySongs(allSongs);
+        return;
+      }
+      const t = term.toLowerCase();
+      const filtered = allSongs.filter(song =>
+        song.uitvoerder.toLowerCase().includes(t) || song.titel.toLowerCase().includes(t)
+      );
+      displaySongs(filtered);
+    }
+
+    function setupButtons() {
+      const letters = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+      const container = document.getElementById('buttons');
+      ['Alles', '#', ...letters].forEach(letter => {
+        const btn = document.createElement('button');
+        btn.textContent = letter;
+        btn.onclick = () => filterByLetter(letter);
+        container.appendChild(btn);
+      });
+    }
+
+    // Font size controls (mobile-visible)
+    function applyFontSize() {
+      document.documentElement.style.setProperty('--list-font', fontSizeEm + 'em');
+    }
+    document.addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'font-dec') {
+        fontSizeEm = Math.max(0.85, (Math.round((fontSizeEm - 0.05) * 100) / 100));
+        applyFontSize();
+      } else if (e.target && e.target.id === 'font-inc') {
+        fontSizeEm = Math.min(1.40, (Math.round((fontSizeEm + 0.05) * 100) / 100));
+        applyFontSize();
+      }
+    });
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      searchSongs(e.target.value);
+    });
+
+    setupButtons();
+    loadSongs(true);
+
+    // Auto-reload CSV when tab gets focus (useful after GitHub upload)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) loadSongs(true);
+    });
+
+    // Initialize font var to current value
+    applyFontSize();
+  </script>
+</body>
+</html>
