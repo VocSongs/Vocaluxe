@@ -20,6 +20,7 @@
       overflow: hidden;
     }
 
+    /* Mobile-only background adjustments (show full height of image) */
     @media (max-width: 820px) {
       html, body {
         background-size: auto 100%;
@@ -27,63 +28,296 @@
       }
     }
 
-    .top-meta { position: fixed; top: 0; left: 0; width: 100%; background: rgba(0,0,0,0.6); z-index: 2000; }
-    .top-meta .meta-wrap { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between;
-      align-items: center; padding: 6px 16px; font-size: 0.95em; }
+    /* Top meta bar */
+    .top-meta {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 2000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+    .top-meta .meta-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 16px;
+      font-size: 0.95em;
+    }
+    .top-meta .left { text-align: left; }
+    .top-meta .right { text-align: right; }
 
-    .top-bar { position: sticky; top: 100px; width: 100%; text-align: center; z-index: 1000; }
-    .filter-row { display: flex; justify-content: center; align-items: center; position: relative; gap: 8px; flex-wrap: wrap; }
-    .filter-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 10px; }
-    .filter-buttons button { padding: 6px 10px; border: none; border-radius: 4px; background-color: rgba(0,0,0,0.6);
-      color: white; cursor: pointer; font-size: 1em; }
-    .filter-buttons button:hover { background-color: rgba(255,255,255,0.2); }
-    #search { padding: 10px; font-size: 1em; width: min(90%,420px); border-radius: 5px; border: none; margin: 6px 0 0; }
+    /* Controls (letters + search), sticky */
+    .top-bar {
+      position: sticky;
+      top: 100px;  /* 30px hoger dan eerder */
+      width: 100%;
+      z-index: 1000;
+      text-align: center;
+      padding-bottom: 10px;
+      background: rgba(0, 0, 0, 0.0);
+    }
 
-    .font-controls-mobile { display: none; position: absolute; left: 50px; top: -40px; gap: 6px; }
-    .font-btn { padding: 6px 10px; border: none; border-radius: 4px; background-color: rgba(0,0,0,0.6);
-      color: white; cursor: pointer; font-size: 1em; }
-    .content { position: absolute; top: 190px; bottom: 0; left: 0; right: 0; overflow-y: auto; text-align: center; }
+    .filter-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+      position: relative;
+    }
 
-    #song-list { background: rgba(0,0,0,0.6); margin: 0 auto; max-width: 900px; border-radius: 10px; padding: 10px 0; }
-    .line { display: flex; justify-content: center; align-items: center; font-size: var(--list-font); padding: 4px 0; }
-    .left-col { width: 40%; text-align: right; padding-right: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .right-col { width: 40%; text-align: left; padding-left: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
 
+    .filter-buttons button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: rgba(0,0,0,0.6);
+      color: white;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .filter-buttons button:hover {
+      background-color: rgba(255,255,255,0.2);
+    }
+
+    #search {
+      padding: 10px;
+      font-size: 1em;
+      width: min(90%, 420px);
+      border-radius: 5px;
+      border: none;
+      margin: 6px 0 0;
+    }
+
+    /* A-/A+ (mobile-only), above search, 50px from left */
+    .font-controls-mobile {
+      display: none;
+      position: absolute;
+      left: 50px;
+      top: -40px;
+      gap: 6px;
+    }
+    .font-btn {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: rgba(0,0,0,0.6);
+      color: white;
+      cursor: pointer;
+      font-size: 1em;
+      line-height: 1;
+    }
+    .font-btn:active { transform: translateY(1px); }
+
+    /* Scroll area for the list */
+    .content {
+      position: absolute;
+      top: 190px;   /* 30px hoger dan eerder */
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      padding: 10px 0 20px;
+      text-align: center;
+    }
+
+    #song-list {
+      font-family: Arial, sans-serif;
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      margin: 0 auto;
+      max-width: 900px;
+      border-radius: 10px;
+      padding: 10px 0;
+    }
+
+    .line {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: var(--list-font);
+      padding: 4px 0;
+    }
+    .left-col {
+      width: 40%;
+      text-align: right;
+      padding-right: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .right-col {
+      width: 40%;
+      text-align: left;
+      padding-left: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Mobile rules */
     @media (max-width: 820px) {
-      .filter-buttons { display: none; }
-      .font-controls-mobile { display: flex; }
+      .filter-buttons { display: none; }             /* verberg A–Z op mobiel */
+      .top-meta .meta-wrap { padding: 6px 10px; font-size: 0.9em; }
+      #search { width: 92%; }
+      :root { --list-font: 0.95em; }
+      .font-controls-mobile { display: flex; }       /* toon A-/A+ op mobiel */
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-  <div class="top-meta"><div class="meta-wrap"><div id="last-update">Update: —</div><div id="song-count">— liedjes</div></div></div>
+  <!-- Meta bovenbalk -->
+  <div class="top-meta">
+    <div class="meta-wrap">
+      <div id="last-update" class="left">Update: —</div>
+      <div id="song-count" class="right">— liedjes</div>
+    </div>
+  </div>
+
+  <!-- Bediening -->
   <div class="top-bar">
     <div class="filter-buttons" id="buttons"></div>
     <div class="filter-row">
-      <div class="font-controls-mobile"><button id="font-dec" class="font-btn">A−</button><button id="font-inc" class="font-btn">A+</button></div>
+      <div class="font-controls-mobile" aria-label="Lettergrootte">
+        <button id="font-dec" class="font-btn" title="Kleiner">A−</button>
+        <button id="font-inc" class="font-btn" title="Groter">A+</button>
+      </div>
       <input type="text" id="search" placeholder="Zoek op uitvoerder of titel..." />
     </div>
   </div>
-  <div class="content"><div id="song-list">Laden...</div></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- Lijst -->
+  <div class="content">
+    <div id="song-list">Laden...</div>
+  </div>
+
   <script>
-    let allSongs = [], totalCount = 0, lastLoaded = null, fontSize = 1.15;
-    function formatDate(d){return new Intl.DateTimeFormat('nl-BE',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d)}
-    function loadSongs(){
-      Papa.parse("songs.csv?ts="+Date.now(),{download:true,header:true,skipEmptyLines:'greedy',complete:r=>{
-        lastLoaded=new Date(); allSongs=r.data.map(o=>({uitvoerder:o.uitvoerder||o.artist||'',titel:o.titel||o.title||''}))
-        .filter(s=>s.uitvoerder&&s.titel); totalCount=allSongs.length; displaySongs(allSongs);}})}
-    function displaySongs(s){let l=document.getElementById('song-list');l.innerHTML='';s.sort((a,b)=>a.uitvoerder.localeCompare(b.uitvoerder))
-      .forEach(x=>l.innerHTML+=`<div class='line'><div class='left-col'>${x.uitvoerder}</div><div class='right-col'>${x.titel}</div></div>`);
-      document.getElementById('last-update').textContent='Update: '+formatDate(lastLoaded);
-      document.getElementById('song-count').textContent=`${totalCount} liedjes`;document.querySelector('.content').scrollTo({top:0})}
-    document.getElementById('search').addEventListener('input',e=>{let t=e.target.value.toLowerCase();
-      displaySongs(t?allSongs.filter(s=>s.uitvoerder.toLowerCase().includes(t)||s.titel.toLowerCase().includes(t)):allSongs)});
-    document.addEventListener('click',e=>{if(e.target.id=='font-dec')fontSize=Math.max(.85,fontSize-.05);
-      if(e.target.id=='font-inc')fontSize=Math.min(1.4,fontSize+.05);
-      document.documentElement.style.setProperty('--list-font',fontSize+'em');});
-    loadSongs();
+    let allSongs = [];
+    let totalCount = 0;
+    let lastLoaded = null;
+    let fontSizeEm = 1.15;
+
+    function applyFontSize(){ document.documentElement.style.setProperty('--list-font', fontSizeEm + 'em'); }
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'font-dec') { fontSizeEm = Math.max(0.85, +(fontSizeEm - 0.05).toFixed(2)); applyFontSize(); }
+      if (e.target.id === 'font-inc') { fontSizeEm = Math.min(1.40, +(fontSizeEm + 0.05).toFixed(2)); applyFontSize(); }
+    });
+
+    function normKeyMap(obj) {
+      const m = {};
+      for (const k in obj) {
+        if (!k) continue;
+        m[k.trim().toLowerCase()] = obj[k];
+      }
+      return m;
+    }
+    function pick(obj, candidates) {
+      for (const c of candidates) {
+        if (obj[c] != null && String(obj[c]).trim() !== "") return String(obj[c]).trim();
+      }
+      return "";
+    }
+    function formatDate(d){
+      try { return new Intl.DateTimeFormat('nl-BE',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d); }
+      catch { return d.toLocaleDateString('nl-BE'); }
+    }
+
+    function updateMetaInfo(displayed) {
+      const total = totalCount.toLocaleString('nl-BE');
+      const shown = displayed.toLocaleString('nl-BE');
+      const dateStr = lastLoaded ? formatDate(lastLoaded) : '—';
+      document.getElementById('last-update').textContent = `Update: ${dateStr}`;
+      document.getElementById('song-count').textContent =
+        (displayed !== totalCount) ? `${total} liedjes — ${shown} getoond` : `${total} liedjes`;
+    }
+
+    function loadSongs(cacheBust=true) {
+      const url = cacheBust ? `songs.csv?ts=${Date.now()}` : "songs.csv";
+      Papa.parse(url, {
+        download: true,
+        header: true,
+        skipEmptyLines: 'greedy',
+        complete: function(results) {
+          lastLoaded = new Date();
+          allSongs = results.data
+            .map(row => {
+              const m = normKeyMap(row);
+              const uitvoerder = pick(m, ['uitvoerder','uitvoeder','artist','artiest','performer','singer']);
+              const titel = pick(m, ['titel','title','song','nummer','track']);
+              return { uitvoerder, titel };
+            })
+            .filter(s => s.uitvoerder && s.titel);
+          totalCount = allSongs.length;
+          displaySongs(allSongs);
+        },
+        error: function(err) {
+          document.getElementById('song-list').textContent = "Fout bij laden van songs.csv: " + err.message;
+          console.error("CSV Load Error:", err);
+        }
+      });
+    }
+
+    function displaySongs(songs) {
+      const list = document.getElementById('song-list');
+      list.innerHTML = "";
+      const sorted = songs.slice().sort((a,b) => a.uitvoerder.localeCompare(b.uitvoerder));
+      sorted.forEach(song => {
+        const line = document.createElement('div');
+        line.className = 'line';
+        line.innerHTML = "<div class='left-col'>" + song.uitvoerder + "</div>" +
+                         "<div class='right-col'>" + song.titel + "</div>";
+        list.appendChild(line);
+      });
+      updateMetaInfo(sorted.length);
+      const scroller = document.querySelector('.content');
+      if (scroller) scroller.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    function filterByLetter(letter) {
+      const search = document.getElementById('search');
+      if (search) search.value = '';
+      if (letter === 'Alles') return displaySongs(allSongs);
+      if (letter === '#') return displaySongs(allSongs.filter(s => !/^[a-zA-Z]/.test(s.uitvoerder)));
+      displaySongs(allSongs.filter(s => s.uitvoerder.toUpperCase().startsWith(letter)));
+    }
+
+    function setupButtons() {
+      const letters = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+      const container = document.getElementById('buttons');
+      ['Alles', '#', ...letters].forEach(letter => {
+        const btn = document.createElement('button');
+        btn.textContent = letter;
+        btn.onclick = () => filterByLetter(letter);
+        container.appendChild(btn);
+      });
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const t = e.target.value.toLowerCase();
+      if (!t) return displaySongs(allSongs);
+      const filtered = allSongs.filter(s =>
+        s.uitvoerder.toLowerCase().includes(t) || s.titel.toLowerCase().includes(t)
+      );
+      displaySongs(filtered);
+    });
+
+    setupButtons();
+    loadSongs(true);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) loadSongs(true); });
   </script>
 </body>
 </html>
