@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <!-- (comments trimmed for brevity in this retry; content identical to previous attempt) -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Vocaluxe Songs</title>
@@ -11,11 +10,14 @@
   <meta http-equiv="Expires" content="0" />
   <style>
     :root { --list-font: 0.95em; }
-    html, body { margin:0; padding:0; font-family:Arial,sans-serif; color:white; height:100%;
-      background:url('SiteBG.png') no-repeat center top; background-size:cover; background-position:center top; background-attachment:fixed; overflow:hidden; }
+    html, body {
+      margin:0; padding:0; font-family:Arial,sans-serif; color:white; height:100%;
+      background:url('SiteBG.png') no-repeat center top;
+      background-size:cover; background-position:center top; background-attachment:fixed; overflow:hidden;
+    }
     @media (max-width:820px){
       html, body { background-size:auto 100%; background-position:center top; }
-      :root { --list-font: 0.70em; }
+      :root { --list-font: 0.70em; } /* mobiele startgrootte */
     }
     .top-meta{position:fixed;top:0;left:0;width:100%;background:rgba(0,0,0,.6);z-index:2000;box-shadow:0 2px 8px rgba(0,0,0,.35)}
     .top-meta .meta-wrap{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 16px;font-size:.70em}
@@ -32,7 +34,12 @@
     .line{display:flex;justify-content:center;align-items:center;font-size:var(--list-font);padding:4px 0}
     .left-col{width:40%;text-align:right;padding-right:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .right-col{width:40%;text-align:left;padding-left:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    @media (max-width:820px){.filter-buttons{display:none}.top-meta .meta-wrap{padding:6px 10px;font-size:.9em}#search{width:92%}.font-controls-mobile{display:flex}}
+    @media (max-width:820px){
+      .filter-buttons{display:none}
+      .top-meta .meta-wrap{padding:6px 10px;font-size:.9em}
+      #search{width:92%}
+      .font-controls-mobile{display:flex}
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
@@ -51,15 +58,20 @@
   <div class="content"><div id="song-list">Laden...</div></div>
   <script>
     let allSongs=[], totalCount=0, lastLoaded=null;
+
+    // CSS-startwaarde van --list-font gebruiken
     function getInitialListFont(){
       const raw=getComputedStyle(document.documentElement).getPropertyValue('--list-font').trim();
       const num=parseFloat(raw); return isNaN(num)?1.15:num;
     }
     let fontSizeEm=getInitialListFont();
-    function applyFontSize(){document.documentElement.style.setProperty('--list-font', fontSizeEm+'em');}
-    function formatDate(d){try{return new Intl.DateTimeFormat('nl-BE',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d)}catch{return d.toLocaleDateString('nl-BE')}}
-    function normKeyMap(o){const m={};for(const k in o){if(!k)continue;m[k.trim().toLowerCase()]=o[k]}return m}
-    function pick(o,cs){for(const c of cs){if(o[c]!=null && String(o[c]).trim()!=='')return String(o[c]).trim()}return ''}
+
+    function applyFontSize(){ document.documentElement.style.setProperty('--list-font', fontSizeEm+'em'); }
+
+    function formatDate(d){ try{ return new Intl.DateTimeFormat('nl-BE',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d) }catch{ return d.toLocaleDateString('nl-BE') } }
+    function normKeyMap(o){ const m={}; for(const k in o){ if(!k) continue; m[k.trim().toLowerCase()]=o[k]; } return m; }
+    function pick(o,cs){ for(const c of cs){ if(o[c]!=null && String(o[c]).trim()!=='') return String(o[c]).trim(); } return ''; }
+
     function loadSongs(cacheBust=true){
       const url=cacheBust?`songs.csv?ts=${Date.now()}`:'songs.csv';
       Papa.parse(url,{download:true,header:true,skipEmptyLines:'greedy',complete:r=>{
@@ -71,30 +83,48 @@
         totalCount=allSongs.length; displaySongs(allSongs);
       },error:err=>{document.getElementById('song-list').textContent='Fout bij laden van songs.csv: '+err.message;}});
     }
-    function updateMetaInfo(n){const total=totalCount.toLocaleString('nl-BE'), shown=n.toLocaleString('nl-BE'),
-      dateStr=lastLoaded?formatDate(lastLoaded):'—';
+
+    function updateMetaInfo(n){
+      const total=totalCount.toLocaleString('nl-BE'), shown=n.toLocaleString('nl-BE'), dateStr=lastLoaded?formatDate(lastLoaded):'—';
       document.getElementById('last-update').textContent=`Update: ${dateStr}`;
-      document.getElementById('song-count').textContent=(n!==totalCount)?`${total} liedjes — ${shown} getoond`:`${total} liedjes`;}
-    function displaySongs(s){const list=document.getElementById('song-list'); list.innerHTML='';
+      document.getElementById('song-count').textContent=(n!==totalCount)?`${total} liedjes — ${shown} getoond`:`${total} liedjes`;
+    }
+
+    function displaySongs(s){
+      const list=document.getElementById('song-list'); list.innerHTML='';
       const sorted=s.slice().sort((a,b)=>a.uitvoerder.localeCompare(b.uitvoerder));
-      sorted.forEach(x=>{const div=document.createElement('div'); div.className='line';
-        div.innerHTML=`<div class="left-col">${x.uitvoerder}</div><div class="right-col">${x.titel}</div>`; list.appendChild(div);});
-      updateMetaInfo(sorted.length); const sc=document.querySelector('.content'); if(sc) sc.scrollTo({top:0,behavior:'auto'});}
-    function filterByLetter(L){const search=document.getElementById('search'); if(search) search.value='';
+      sorted.forEach(x=>{ const div=document.createElement('div'); div.className='line';
+        div.innerHTML=`<div class="left-col">${x.uitvoerder}</div><div class="right-col">${x.titel}</div>`; list.appendChild(div); });
+      updateMetaInfo(sorted.length);
+      const sc=document.querySelector('.content'); if(sc) sc.scrollTo({top:0,behavior:'auto'});
+    }
+
+    function filterByLetter(L){ const search=document.getElementById('search'); if(search) search.value='';
       if(L==='Alles') return displaySongs(allSongs);
       if(L==='#') return displaySongs(allSongs.filter(s=>!/^[a-zA-Z]/.test(s.uitvoerder)));
-      displaySongs(allSongs.filter(s=>s.uitvoerder.toUpperCase().startsWith(L)));}
-    function setupButtons(){const letters=[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'], c=document.getElementById('buttons');
-      ['Alles','#',...letters].forEach(L=>{const b=document.createElement('button'); b.textContent=L; b.onclick=()=>filterByLetter(L); c.appendChild(b);});}
-    document.getElementById('search').addEventListener('input',e=>{const t=e.target.value.toLowerCase();
-      if(!t) return displaySongs(allSongs);
-      displaySongs(allSongs.filter(s=>s.uitvoerder.toLowerCase().includes(t)||s.titel.toLowerCase().includes(t)));});
-    document.addEventListener('click',e=>{
-      if(e.target.id==='font-dec'){fontSizeEm=Math.max(0.85,+(fontSizeEm-0.05).toFixed(2)); applyFontSize();}
-      if(e.target.id==='font-inc'){fontSizeEm=Math.min(1.40,+(fontSizeEm+0.05).toFixed(2)); applyFontSize();}
+      displaySongs(allSongs.filter(s=>s.uitvoerder.toUpperCase().startsWith(L)));
+    }
+
+    function setupButtons(){ const letters=[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'], c=document.getElementById('buttons');
+      ['Alles','#',...letters].forEach(L=>{ const b=document.createElement('button'); b.textContent=L; b.onclick=()=>filterByLetter(L); c.appendChild(b); });
+    }
+
+    document.getElementById('search').addEventListener('input',e=>{
+      const t=e.target.value.toLowerCase(); if(!t) return displaySongs(allSongs);
+      displaySongs(allSongs.filter(s=>s.uitvoerder.toLowerCase().includes(t)||s.titel.toLowerCase().includes(t)));
     });
-    setupButtons(); applyFontSize(); loadSongs(true);
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden) loadSongs(true)});
+
+    // ✅ Nieuwe, veilige grenzen en stapgrootte voor A-/A+ (werken ook vanaf 0.70em)
+    const STEP=0.05, MIN=0.50, MAX=1.40;
+    document.addEventListener('click',e=>{
+      if(e.target.id==='font-dec'){ fontSizeEm = Math.max(MIN, +(fontSizeEm-STEP).toFixed(2)); applyFontSize(); }
+      if(e.target.id==='font-inc'){ fontSizeEm = Math.min(MAX, +(fontSizeEm+STEP).toFixed(2)); applyFontSize(); }
+    });
+
+    setupButtons();
+    applyFontSize(); // zet inline startwaarde gelijk aan CSS
+    loadSongs(true);
+    document.addEventListener('visibilitychange',()=>{ if(!document.hidden) loadSongs(true); });
   </script>
 </body>
 </html>
