@@ -14,8 +14,6 @@
     :root {
       /* Basis lettergrootte van de LIJST (A-/A+ beïnvloedt deze) */
       --list-font: 0.95em;
-      --phone-list-font: 0.70em;   /* mobiel */
-      --desk-list-font: 1.40em;    /* desktop *
 
       /* ========== POSITIES (kun je per device apart instellen) ========== */
       --letters-top: 120px;
@@ -170,7 +168,20 @@
     }
     .left-col { text-align:right; padding-right:10px; }
     .right-col { text-align:left; padding-left:10px; }
-  </style>
+  
+/* ========== Device-specifieke mapping van startgrootte naar --list-font ========== */
+@media (max-width: 820px) {
+  :root {
+    --list-font: var(--phone-list-font, 0.80em);
+  }
+}
+@media (min-width: 821px) {
+  :root {
+    --list-font: var(--desk-list-font, 1.00em);
+  }
+}
+
+</style>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
@@ -224,7 +235,7 @@
     }
 
     function loadSongs(cacheBust=true){
-      const url = cacheBust ? `songs.csv?ts=${Date.now()}` : 'songs.csv';
+      const url = cacheBust ? `songs.csv?ts=1761077697?ts=${Date.now()}` : 'songs.csv?ts=1761077697';
       Papa.parse(url, {
         download: true, header: true, skipEmptyLines: 'greedy',
         complete: result => {
@@ -239,7 +250,7 @@
           displaySongs(allSongs);
         },
         error: err => {
-          document.getElementById('song-list').textContent = 'Fout bij laden van songs.csv: ' + err.message;
+          document.getElementById('song-list').textContent = 'Fout bij laden van songs.csv?ts=1761077697: ' + err.message;
         }
       });
     }
