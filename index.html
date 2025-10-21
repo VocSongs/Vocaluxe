@@ -168,7 +168,27 @@
     }
     .left-col { text-align:right; padding-right:10px; }
     .right-col { text-align:left; padding-left:10px; }
-  </style>
+  
+/* ========== Mobiel: positie van de - en + knoppen aanpassen ========== */
+@media (max-width: 820px) {
+  .font-controls {
+    position: fixed;
+    top: 10px;           /* afstand van bovenrand */
+    left: 0; right: 0;
+    display: flex;
+    justify-content: space-between; /* spreidt - en + */
+    padding: 0 14px;     /* afstand tot schermrand */
+    z-index: 2000;
+  }
+
+  .font-btn {
+    font-size: 1.4em;    /* iets groter op mobiel (optioneel) */
+    padding: 4px 10px;
+    border-radius: 8px;
+  }
+}
+
+</style>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
