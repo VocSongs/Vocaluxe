@@ -13,8 +13,7 @@
        =============================== */
     :root {
       /* Basis lettergrootte van de LIJST (A-/A+ beïnvloedt deze) */
-      --phone-list-font: 0.5em;    /* kleiner op mobiel */
-      --desk-list-font: 1.4em;     /* groter op desktop */
+      --list-font: 0.95em;
 
       /* ========== POSITIES (kun je per device apart instellen) ========== */
       --letters-top: 120px;
@@ -29,16 +28,16 @@
       /* ========== KNOPGROEP AFSTAND (gap) en KNOPPADDING (per device) ========== */
       /* Mobiel */
       --phone-btn-gap: 3px;
-      --phone-btn-pad-v: 4px;   /* verticale padding per knop */
-      --phone-btn-pad-h: 4px;  /* horizontale padding per knop */
+      --phone-btn-pad-v: 3px;   /* verticale padding per knop */
+      --phone-btn-pad-h: 8px;  /* horizontale padding per knop */
       /* Multiplier die de knoppentekst koppelt aan de lijstgrootte */
-      --phone-btn-font-mult: 1.1; /* 1.2 = zelfde als lijst; 1.1 = 10% groter */
+      --phone-btn-font-mult: 0.8; /* 1.0 = zelfde als lijst; 1.2 = 20% groter */
 
       /* Desktop */
-      --desk-btn-gap: 4px;
-      --desk-btn-pad-v: 5px;
-      --desk-btn-pad-h: 5px;
-      --desk-btn-font-mult: 1;
+      --desk-btn-gap: 8px;
+      --desk-btn-pad-v: 6px;
+      --desk-btn-pad-h: 12px;
+      --desk-btn-font-mult: 1.1;
     }
 
     /* Altijd zwarte basis achter de achtergrondafbeelding */
@@ -57,8 +56,8 @@
     @media (max-width: 820px) {
       body { background-image:url('BGPHONE.png'); }
       :root {
-        --letters-top: var(--phone-letters-top, 65px);
-        --search-top: var(--phone-search-top, 115px);
+        --letters-top: var(--phone-letters-top, 90px);
+        --search-top: var(--phone-search-top, 120px);
         --font-top: var(--phone-font-top, 50px);
         --content-top: var(--phone-content-top, 150px);
         --list-font: var(--phone-list-font, var(--list-font));
@@ -80,9 +79,9 @@
       body { background-image:url('BGDESK.png'); }
       :root {
         --letters-top: var(--desk-letters-top, 120px);
-        --search-top: var(--desk-search-top, 160px);
+        --search-top: var(--desk-search-top, 170px);
         --font-top: var(--desk-font-top, 65px);
-        --content-top: var(--desk-content-top, 200px);
+        --content-top: var(--desk-content-top, 220px);
         --list-font: var(--desk-list-font, var(--list-font));
       }
 
@@ -169,27 +168,7 @@
     }
     .left-col { text-align:right; padding-right:10px; }
     .right-col { text-align:left; padding-left:10px; }
-  
-/* ========== Mobiel: positie van de - en + knoppen aanpassen ========== */
-@media (max-width: 820px) {
-  .font-controls {
-    position: fixed;
-    top: 10px;           /* afstand van bovenrand */
-    left: 0; right: 0;
-    display: flex;
-    justify-content: space-between; /* spreidt - en + */
-    padding: 0 14px;     /* afstand tot schermrand */
-    z-index: 2000;
-  }
-
-  .font-btn {
-    font-size: 1.4em;    /* iets groter op mobiel (optioneel) */
-    padding: 4px 10px;
-    border-radius: 8px;
-  }
-}
-
-</style>
+  </style>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
@@ -322,8 +301,8 @@
 
     // Init
     setupButtons();
-    applyFontSize();
-    loadSongs(true);
+    /* startgrootte komt uit CSS, dus geen applyFontSize() hier */
+loadSongs(true);
 
     // Herladen bij terugkeren naar tab
     document.addEventListener('visibilitychange',()=>{
