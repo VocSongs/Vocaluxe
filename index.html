@@ -117,13 +117,25 @@
     }
 
     /* Scrollbare content (lijst) – hoogte instelbaar via var(--content-top) */
-    .content {
-      position:absolute; top:var(--content-top); bottom:0; left:0; right:0;
-      overflow-y:auto; padding:10px 0 24px; text-align:center;
-    }
-    #song-list {
-      background:rgba(0,0,0,.6); margin:0 auto; max-width:1000px; border-radius:10px; padding:10px 0;
-    }
+.content {
+  position: fixed;
+  top: var(--content-top);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  text-align: center;
+  padding: 10px 0 24px;
+}
+
+#song-list {
+  background: rgba(0,0,0,.6);
+  margin: 0 auto;
+  max-width: 900px;
+  border-radius: 10px;
+  padding: 10px 0;
+  position: relative;   /* blijft binnen .content scrollen */
+  z-index: 1;
     .line {
       display:flex; justify-content:center; align-items:center;
       font-size:var(--list-font); padding:4px 0;
