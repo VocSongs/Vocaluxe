@@ -9,71 +9,90 @@
   <meta http-equiv="Expires" content="0" />
   <style>
     /* ===============================
-       Globale variabelen en resets
+       Globale variabelen (makkelijk aanpassen)
        =============================== */
     :root {
-      /* Lettergrootte van de lijst */
+      /* Basis lettergrootte van de LIJST (A-/A+ beïnvloedt deze) */
       --list-font: 0.95em;
 
-      /* ====== Standaard (wordt overschreven per device) ====== */
-      --letters-top: 100px;   /* Hoogte van de letterknoppenbalk */
-      --search-top: 190px;    /* Hoogte van het zoekveld */
-      --font-top: 145px;      /* Hoogte van A-/A+ */
-      --content-top: 240px;   /* Startpositie van de scrollbare lijst */
+      /* ========== POSITIES (kun je per device apart instellen) ========== */
+      --letters-top: 120px;
+      --search-top: 170px;
+      --font-top: 75px;
+      --content-top: 220px;
+
+      /* ========== SONG-LIJST breedte (per device) ========== */
+      --phone-list-width: 95%;   /* bv. 95% voor mobiel */
+      --desk-list-width: 1100px; /* bv. 1100px voor desktop */
+
+      /* ========== KNOPGROEP AFSTAND (gap) en KNOPPADDING (per device) ========== */
+      /* Mobiel */
+      --phone-btn-gap: 6px;
+      --phone-btn-pad-v: 6px;   /* verticale padding per knop */
+      --phone-btn-pad-h: 10px;  /* horizontale padding per knop */
+      /* Multiplier die de knoppentekst koppelt aan de lijstgrootte */
+      --phone-btn-font-mult: 1.0; /* 1.0 = zelfde als lijst; 1.2 = 20% groter */
+
+      /* Desktop */
+      --desk-btn-gap: 8px;
+      --desk-btn-pad-v: 6px;
+      --desk-btn-pad-h: 12px;
+      --desk-btn-font-mult: 1.0;
     }
 
-    /* ====== Mobiele standaardwaarden (aanpasbaar) ====== */
-    :root {
-      --phone-letters-top: 120px;
-      --phone-search-top: 170px;
-      --phone-font-top: 75px;
-      --phone-content-top: 220px;
-      --phone-list-font: 0.80em;  /* standaard lijstgrootte mobiel */
-    }
-
-    /* ====== Desktop standaardwaarden (aanpasbaar) ====== */
-    :root {
-      --desk-letters-top: 120px;
-      --desk-search-top: 160px;
-      --desk-font-top: 75px;
-      --desk-content-top: 200px;
-      --desk-list-font: 0.95em;   /* standaard lijstgrootte desktop */
-    }
-
-    /* Altijd zwarte basis */
+    /* Altijd zwarte basis achter de achtergrondafbeelding */
     html { background:#000 !important; }
     body {
       margin:0; padding:0; font-family:Arial, sans-serif; color:#fff;
       min-height:100vh;
-      /* Achtergrondinstellingen: geen cropping + fixed */
       background-repeat:no-repeat;
       background-position:center top;
-      background-size:cover;     /* zorgt voor volledig zichtbare afbeelding */
-      background-attachment:fixed; /* blijft staan tijdens scrollen */
-      overflow:hidden;             /* we scrollen enkel in .content */
+      background-size:cover;          /* vult het scherm (kan bijsnijden) */
+      background-attachment:fixed;    /* blijft staan tijdens scroll */
+      overflow:hidden;                /* alleen de lijst scrollt */
     }
 
-    /* 📱 Mobiel: BGPHONE.png + eigen variabelen mappen */
+    /* ========== Mobiel: variabelen mappen ========== */
     @media (max-width: 820px) {
       body { background-image:url('BGPHONE.png'); }
       :root {
-        --letters-top: var(--phone-letters-top);
-        --search-top: var(--phone-search-top);
-        --font-top: var(--phone-font-top);
-        --content-top: var(--phone-content-top);
-        --list-font: var(--phone-list-font);
+        --letters-top: var(--phone-letters-top, 120px);
+        --search-top: var(--phone-search-top, 170px);
+        --font-top: var(--phone-font-top, 75px);
+        --content-top: var(--phone-content-top, 220px);
+        --list-font: var(--phone-list-font, var(--list-font));
+      }
+
+      /* Breedte liedjesvak mobiel */
+      #song-list { max-width: var(--phone-list-width); }
+
+      /* Knoppen mobiel – grootte & afstand koppelbaar aan lijstgrootte */
+      .filter-buttons { gap: var(--phone-btn-gap); }
+      .filter-buttons button {
+        font-size: calc(var(--list-font) * var(--phone-btn-font-mult));
+        padding: var(--phone-btn-pad-v) var(--phone-btn-pad-h);
       }
     }
 
-    /* 🖥️ Desktop: BGDESK.png + eigen variabelen mappen */
+    /* ========== Desktop: variabelen mappen ========== */
     @media (min-width: 821px) {
       body { background-image:url('BGDESK.png'); }
       :root {
-        --letters-top: var(--desk-letters-top);
-        --search-top: var(--desk-search-top);
-        --font-top: var(--desk-font-top);
-        --content-top: var(--desk-content-top);
-        --list-font: var(--desk-list-font);
+        --letters-top: var(--desk-letters-top, 160px);
+        --search-top: var(--desk-search-top, 210px);
+        --font-top: var(--desk-font-top, 165px);
+        --content-top: var(--desk-content-top, 260px);
+        --list-font: var(--desk-list-font, var(--list-font));
+      }
+
+      /* Breedte liedjesvak desktop */
+      #song-list { max-width: var(--desk-list-width); }
+
+      /* Knoppen desktop – grootte & afstand koppelbaar aan lijstgrootte */
+      .filter-buttons { gap: var(--desk-btn-gap); }
+      .filter-buttons button {
+        font-size: calc(var(--list-font) * var(--desk-btn-font-mult));
+        padding: var(--desk-btn-pad-v) var(--desk-btn-pad-h);
       }
     }
 
@@ -98,12 +117,12 @@
       background:transparent;
     }
     .filter-buttons {
-      display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin:0 auto;
+      display:flex; flex-wrap:wrap; justify-content:center; margin:0 auto;
       max-width:1200px;
     }
     .filter-buttons button {
-      padding:6px 10px; border:none; border-radius:6px;
-      background:rgba(0,0,0,.6); color:#fff; cursor:pointer; font-size:1em;
+      border:none; border-radius:6px;
+      background:rgba(0,0,0,.6); color:#fff; cursor:pointer; line-height:1;
     }
     .filter-buttons button:hover { background:rgba(255,255,255,.2); }
 
@@ -116,29 +135,33 @@
       z-index:1150;
     }
 
-    /* Scrollbare content (lijst) – hoogte instelbaar via var(--content-top) */
-.content {
-  position: fixed;
-  top: var(--content-top);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
-  text-align: center;
-  padding: 10px 0 24px;
-}
+    /* Scrollbare content (vast) – het LIEDJESVAK staat stil op de pagina */
+    .content {
+      position: fixed;
+      top: var(--content-top);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
+      text-align: center;
+      padding: 10px 0 24px;
+    }
 
-#song-list {
-  background: rgba(0,0,0,.6);
-  margin: 0 auto;
-  max-width: 900px;
-  border-radius: 10px;
-  padding: 10px 0;
-  position: relative;   /* blijft binnen .content scrollen */
-  z-index: 1;
+    /* Liedjesvak */
+    #song-list {
+      background: rgba(0,0,0,.6);
+      margin: 0 auto;
+      border-radius: 10px;
+      padding: 10px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Rijen in de lijst */
     .line {
       display:flex; justify-content:center; align-items:center;
-      font-size:var(--list-font); padding:4px 0;
+      font-size:var(--list-font);
+      padding:4px 0;
     }
     .left-col, .right-col {
       width:40%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
@@ -150,19 +173,18 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-
-  <!-- A-/A+ (nu voor desktop én mobiel) -->
+  <!-- A-/A+ -->
   <div class="font-controls" aria-label="Lettergrootte">
-    <button id="font-dec" class="font-btn" title="Kleiner">−</button>
-    <button id="font-inc" class="font-btn" title="Groter">+</button>
+    <button id="font-dec" class="font-btn" title="Kleiner">A−</button>
+    <button id="font-inc" class="font-btn" title="Groter">A+</button>
   </div>
 
-  <!-- Letterknoppen (losgekoppeld, eigen hoogte) -->
+  <!-- Letterknoppen -->
   <div id="letters-bar">
     <div class="filter-buttons" id="buttons"></div>
   </div>
 
-  <!-- Zoekveld (losgekoppeld, eigen hoogte) -->
+  <!-- Zoekveld -->
   <input type="text" id="search" placeholder="Zoek op uitvoerder of titel..." />
 
   <!-- Scrollbare lijst -->
@@ -174,7 +196,7 @@
     // ===============================
     // Logica & helperfuncties
     // ===============================
-    let allSongs = [], totalCount = 0, lastLoaded = null;
+    let allSongs = [], totalCount = 0;
 
     function getInitialListFont() {
       const raw = getComputedStyle(document.documentElement).getPropertyValue('--list-font').trim();
@@ -184,14 +206,6 @@
     let fontSizeEm = getInitialListFont();
     function applyFontSize() {
       document.documentElement.style.setProperty('--list-font', fontSizeEm + 'em');
-    }
-
-    function formatDate(d) {
-      try {
-        return new Intl.DateTimeFormat('nl-BE', { day:'2-digit', month:'2-digit', year:'numeric' }).format(d);
-      } catch {
-        return d.toLocaleDateString('nl-BE');
-      }
     }
 
     function normKeyMap(o){
@@ -212,7 +226,6 @@
       Papa.parse(url, {
         download: true, header: true, skipEmptyLines: 'greedy',
         complete: result => {
-          lastLoaded = new Date();
           allSongs = result.data.map(row => {
             const m = normKeyMap(row);
             const uitvoerder = pick(m, ['uitvoerder','uitvoeder','artist','artiest','performer','singer']);
@@ -229,15 +242,6 @@
       });
     }
 
-    function updateMetaInfo(shownCount){
-      const total = totalCount.toLocaleString('nl-BE');
-      const shown = shownCount.toLocaleString('nl-BE');
-      const dateStr = lastLoaded ? formatDate(lastLoaded) : '—';
-      document.getElementById('last-update').textContent = `Update: ${dateStr}`;
-      document.getElementById('song-count').textContent =
-        (shownCount !== totalCount) ? `${total} liedjes — ${shown} getoond` : `${total} liedjes`;
-    }
-
     function displaySongs(list){
       const container = document.getElementById('song-list');
       container.innerHTML = '';
@@ -248,7 +252,6 @@
         div.innerHTML = `<div class="left-col">${x.uitvoerder}</div><div class="right-col">${x.titel}</div>`;
         container.appendChild(div);
       });
-      updateMetaInfo(sorted.length);
       const scroller = document.querySelector('.content');
       if(scroller) scroller.scrollTo({ top: 0, behavior: 'auto' });
     }
@@ -283,7 +286,7 @@
       });
     });
 
-    // A-/A+ bediening
+    // A-/A+ bediening (past lijstgrootte aan – knoppen volgen via CSS multiplier)
     const STEP=0.05, MIN=0.50, MAX=1.60;
     document.addEventListener('click', e => {
       if(e.target && e.target.id === 'font-dec'){
