@@ -172,12 +172,33 @@
 /* ========== Device-specifieke mapping van startgrootte naar --list-font ========== */
 @media (max-width: 820px) {
   :root {
-    --list-font: var(--phone-list-font, 0.70em);
+    --list-font: var(--phone-list-font, 0.80em);
   }
 }
 @media (min-width: 821px) {
   :root {
-    --list-font: var(--desk-list-font, 1.40em);
+    --list-font: var(--desk-list-font, 1.00em);
+  }
+}
+
+
+/* ========== Mobiel: positie van de - en + knoppen links en rechtsboven ========== */
+@media (max-width: 820px) {
+  .font-controls {
+    position: fixed;
+    top: 10px;             /* afstand van de bovenrand */
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between; /* spreidt - en + */
+    padding: 0 14px;       /* afstand tot schermrand */
+    z-index: 2000;
+  }
+
+  .font-btn {
+    font-size: 1.4em;      /* iets groter op mobiel (optioneel) */
+    padding: 4px 10px;
+    border-radius: 8px;
   }
 }
 
