@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -10,17 +11,28 @@
   <style>
     :root { --list-font: 0.95em; }
 
-    /* 🌑 Zwarte achtergrond toegevoegd zodat witte vlakken verdwijnen */
-    html, body {
+    html { background-color: #000 !important; }
+
+    body {
       margin:0; padding:0; font-family:Arial,sans-serif; color:white; height:100%;
-      background-color:black;  /* ✅ Nieuw: vult witte zijkanten met zwart */
-      background:url('SiteBGDT.png') no-repeat center top;
-      background-size:contain; background-position:center top; background-attachment:fixed; overflow:hidden;
+      background-color:#000;
+      background-image:url('SiteBGDT.png');
+      background-repeat:no-repeat;
+      background-position:center top;
+      background-size:cover;
+      background-attachment:fixed;
+      overflow:hidden;
     }
 
     @media (max-width:820px){
-      html, body { background:url('SiteBG.png') no-repeat center top;
-                   background-size:auto 100%; background-position:center top; }
+      body {
+        background-color:#000;
+        background-image:url('SiteBG.png');
+        background-repeat:no-repeat;
+        background-position:center top;
+        background-size:auto 100%;
+        background-attachment:fixed;
+      }
       :root { --list-font: 0.70em; }
     }
 
