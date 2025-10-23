@@ -315,10 +315,10 @@ function normalizeLang(val){
   if (t.startsWith('FR') || t.includes('FRANS') || t.includes('FRANÇAIS') || t.includes('FRANCAIS')) return 'FR';
 
   // DU (Duits / Deutsch / DE)
-  if (t === 'DU' || t.startsWith('DU') || t.includes('DUIT') || t.startsWith('DE') || t.includes('DEUT')) return 'DU';
+  if (t === 'DU' || t.startsWith('DU') || t.includes('DUITS') || t.startsWith('DE') || t.includes('DEUT')) return 'DU';
 
   // A (Andere)
-  if (t.includes('ANDER')) return 'A';
+  if (t.includes('ANDERE')) return 'A';
 
   // Fallback
   return 'A';
