@@ -202,6 +202,18 @@
   }
 }
 
+
+    /* Taalfilter-balk – vaste positie, direct onder zoekveld */
+    #language-bar {
+      position: fixed;
+      top: calc(var(--search-top) + 42px);
+      left: 0; right: 0;
+      z-index: 1125;
+      text-align: center;
+      padding-bottom: 4px;
+      background: transparent;
+    }
+
 </style>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -221,6 +233,11 @@
   <!-- Zoekveld -->
   <input type="text" id="search" placeholder="Zoek op uitvoerder of titel..." />
 
+  <!-- Taalfilter (onder de zoekbalk) -->
+  <div id="language-bar">
+    <div class="filter-buttons" id="lang-buttons"></div>
+  </div>
+
   <!-- Scrollbare lijst -->
   <div class="content">
     <div id="song-list">Laden...</div>
@@ -231,6 +248,45 @@
     // Logica & helperfuncties
     // ===============================
     let allSongs = [], totalCount = 0;
+
+    // Filters state
+    let currentLetter = 'Alles';
+    let currentLang = 'Alle'; // Alle | NL | FR | DU | A (Andere)
+    let currentSearch = '';
+
+    function renderFiltered(){
+      let list = allSongs;
+      // letter filter
+      if (currentLetter !== 'Alles') {
+        if (currentLetter === '#') {
+          list = list.filter(s => !/^[a-zA-Z]/.test(s.uitvoerder));
+        } else {
+          const L = currentLetter.toUpperCase();
+          list = list.filter(s => (s.uitvoerder || '').toUpperCase().startsWith(L));
+        }
+      }
+      // language filter
+      if (currentLang !== 'Alle') {
+        if (currentLang === 'A') {
+          list = list.filter(s => {
+            const t = (s.taal || '').trim().toUpperCase();
+            return t && !['NL','FR','DU'].includes(t);
+          });
+        } else {
+          list = list.filter(s => (s.taal || '').trim().toUpperCase() === currentLang);
+        }
+      }
+      // search filter
+      const q = currentSearch.trim().toLowerCase();
+      if (q) {
+        list = list.filter(s =>
+          (s.uitvoerder || '').toLowerCase().includes(q) ||
+          (s.titel || '').toLowerCase().includes(q)
+        );
+      }
+      displaySongs(list);
+    }
+
 
     function getInitialListFont() {
       const raw = getComputedStyle(document.documentElement).getPropertyValue('--list-font').trim();
@@ -264,11 +320,12 @@
             const m = normKeyMap(row);
             const uitvoerder = pick(m, ['uitvoerder','uitvoeder','artist','artiest','performer','singer']);
             const titel = pick(m, ['titel','title','song','nummer','track']);
-            return { uitvoerder, titel };
+            const taal  = pick(m, ['taal','language','lang','l']);
+            return { uitvoerder, titel, taal };
           }).filter(s => s.uitvoerder && s.titel);
 
           totalCount = allSongs.length;
-          displaySongs(allSongs);
+          renderFiltered();
         },
         error: err => {
           document.getElementById('song-list').textContent = 'Fout bij laden van songs.csv?ts=1761077697: ' + err.message;
@@ -293,9 +350,9 @@
     function filterByLetter(L){
       const search = document.getElementById('search');
       if(search) search.value = '';
-      if(L==='Alles') return displaySongs(allSongs);
-      if(L==='#') return displaySongs(allSongs.filter(s=>!/^[a-zA-Z]/.test(s.uitvoerder)));
-      displaySongs(allSongs.filter(s=>s.uitvoerder.toUpperCase().startsWith(L)));
+      currentSearch = '';
+      currentLetter = L;
+      renderFiltered();
     }
 
     function setupButtons(){
@@ -309,14 +366,27 @@
       });
     }
 
+    function filterByLanguage(lang){
+      currentLang = lang;
+      renderFiltered();
+    }
+
+    function setupLanguageButtons(){
+      const langs = ['Alle','NL','FR','DU','A'];
+      const c = document.getElementById('lang-buttons');
+      langs.forEach(L => {
+        const b = document.createElement('button');
+        b.textContent = L;
+        b.onclick = () => filterByLanguage(L);
+        c.appendChild(b);
+      });
+    }
+
     // Live zoeken
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('search').addEventListener('input', e => {
-        const t = e.target.value.toLowerCase();
-        if(!t) return displaySongs(allSongs);
-        displaySongs(allSongs.filter(s =>
-          s.uitvoerder.toLowerCase().includes(t) || s.titel.toLowerCase().includes(t)
-        ));
+        currentSearch = e.target.value;
+        renderFiltered();
       });
     });
 
@@ -335,6 +405,7 @@
 
     // Init
     setupButtons();
+    setupLanguageButtons();
     /* startgrootte komt uit CSS, dus geen applyFontSize() hier */
 loadSongs(true);
 
