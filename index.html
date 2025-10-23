@@ -254,13 +254,40 @@
     let currentLang = 'Alle'; // Alle | NL | FR | DU | A (Andere)
     let currentSearch = '';
 
-    function renderFiltered(){
-      let list = allSongs;
-      // letter filter
-      if (currentLetter !== 'Alles') {
-        if (currentLetter === '#') {
-          list = list.filter(s => !/^[a-zA-Z]/.test(s.uitvoerder));
-        } else {
+    function renderFiltered() {
+  let list = allSongs.slice();
+
+  // 1) Zoekfilter
+  const q = (currentSearch || '').toLowerCase();
+  if (q) {
+    list = list.filter(s =>
+      (s.uitvoerder || '').toLowerCase().includes(q) ||
+      (s.titel || '').toLowerCase().includes(q)
+    );
+  }
+
+  // 2) Letterfilter
+  if (currentLetter !== 'Alles') {
+    if (currentLetter === '#') {
+      list = list.filter(s => !/^[a-zA-Z]/.test(s.uitvoerder || ''));
+    } else {
+      const L = (currentLetter || '').toUpperCase();
+      list = list.filter(s => (s.uitvoerder || '').toUpperCase().startsWith(L));
+    }
+  }
+
+  // 3) Taalfilter
+  if (currentLang && currentLang !== 'Alle') {
+    if (currentLang === 'A') {
+      list = list.filter(s => s.taalCode === 'A');
+    } else {
+      list = list.filter(s => s.taalCode === currentLang);
+    }
+  }
+
+  displaySongs(list);
+}
+else {
           const L = currentLetter.toUpperCase();
           list = list.filter(s => (s.uitvoerder || '').toUpperCase().startsWith(L));
         }
@@ -304,7 +331,16 @@
       return m;
     }
 
-    function pick(o, candidates){
+    function normalizeLang(val){
+  const t = (val||'').toString().trim().toUpperCase();
+  if(!t) return 'A';
+  if(t.startsWith('NL') || t.includes('NED')) return 'NL';
+  if(t.startsWith('FR') || t.includes('FRA')) return 'FR';
+  if(t==='DU' || t.startsWith('DE') || t.includes('DEUT')) return 'DU';
+  return 'A';
+}
+
+function pick(o, candidates){
       for(const c of candidates){
         if(o[c]!=null && String(o[c]).trim()!=='') return String(o[c]).trim();
       }
@@ -321,7 +357,8 @@
             const uitvoerder = pick(m, ['uitvoerder','uitvoeder','artist','artiest','performer','singer']);
             const titel = pick(m, ['titel','title','song','nummer','track']);
             const taal  = pick(m, ['taal','language','lang','l']);
-            return { uitvoerder, titel, taal };
+            const taalCode = normalizeLang(taal);
+            return { uitvoerder, titel, taal, taalCode };
           }).filter(s => s.uitvoerder && s.titel);
 
           totalCount = allSongs.length;
@@ -367,19 +404,22 @@
     }
 
     function filterByLanguage(lang){
-      currentLang = lang;
-      renderFiltered();
-    }
-
-    function setupLanguageButtons(){
-      const langs = ['Alle','NL','FR','DU','A'];
-      const c = document.getElementById('lang-buttons');
-      langs.forEach(L => {
-        const b = document.createElement('button');
-        b.textContent = L;
-        b.onclick = () => filterByLanguage(L);
-        c.appendChild(b);
-      });
+  currentLang = lang;
+  renderFiltered();
+}
+function setupLanguageButtons(){
+  const langs = ['Alle','NL','FR','DU','A'];
+  const c = document.getElementById('lang-buttons');
+  if (!c) return;
+  c.innerHTML = '';
+  langs.forEach(L => {
+    const b = document.createElement('button');
+    b.textContent = L;
+    b.onclick = () => filterByLanguage(L);
+    c.appendChild(b);
+  });
+}
+);
     }
 
     // Live zoeken
