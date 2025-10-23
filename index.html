@@ -304,16 +304,27 @@
       return m;
     }
 
-    function normalizeLang(val){
-      const t = (val||'').toString().trim().toUpperCase();
-      if (!t) return 'A';
-      if (t.startsWith('NL') || t.includes('NED')) return 'NL';
-      if (t.startsWith('FR') || t.includes('FRA')) return 'FR';
-      if (t === 'DU' || t.startsWith('DE') || t.includes('DEUT')) return 'DU';
-      return 'A';
-    }
+    
+function normalizeLang(val){
+  const t = (val||'').toString().trim().toUpperCase();
 
-    function pick(o, candidates){
+  // NL (Nederlands)
+  if (t.startsWith('NL') || t.includes('NEDER')) return 'NL';
+
+  // FR (Frans / Français / Francais)
+  if (t.startsWith('FR') || t.includes('FRANS') || t.includes('FRANÇAIS') || t.includes('FRANCAIS')) return 'FR';
+
+  // DU (Duits / Deutsch / DE)
+  if (t === 'DU' || t.startsWith('DU') || t.includes('DUIT') || t.startsWith('DE') || t.includes('DEUT')) return 'DU';
+
+  // A (Andere)
+  if (t.includes('ANDER')) return 'A';
+
+  // Fallback
+  return 'A';
+}
+
+function pick(o, candidates){
       for(const c of candidates){
         if(o[c]!=null && String(o[c]).trim()!=='') return String(o[c]).trim();
       }
