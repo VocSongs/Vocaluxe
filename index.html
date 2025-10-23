@@ -269,6 +269,27 @@
   // 2) Letterfilter
   if (currentLetter !== 'Alles') {
     if (currentLetter === '#') {
+      list = list.filter(s => !/^[a-zA-Z]/.test((s.uitvoerder || '')));
+    } else {
+      const L = (currentLetter || '').toUpperCase();
+      list = list.filter(s => (s.uitvoerder || '').toUpperCase().startsWith(L));
+    }
+  }
+
+  // 3) Taalfilter
+  if (currentLang && currentLang !== 'Alle') {
+    if (currentLang === 'A') {
+      list = list.filter(s => (s.taalCode || 'A') === 'A');
+    } else {
+      list = list.filter(s => (s.taalCode || '').toUpperCase() === currentLang);
+    }
+  }
+
+  displaySongs(list);
+}
+// 2) Letterfilter
+  if (currentLetter !== 'Alles') {
+    if (currentLetter === '#') {
       list = list.filter(s => !/^[a-zA-Z]/.test(s.uitvoerder || ''));
     } else {
       const L = (currentLetter || '').toUpperCase();
@@ -415,9 +436,11 @@ function setupLanguageButtons(){
   langs.forEach(L => {
     const b = document.createElement('button');
     b.textContent = L;
-    b.onclick = () => filterByLanguage(L);
+    b.addEventListener('click', () => filterByLanguage(L));
     c.appendChild(b);
   });
+}
+);
 }
 );
     }
