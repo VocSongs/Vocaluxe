@@ -56,8 +56,8 @@
     @media (max-width: 820px) {
       body { background-image:url('BGPHONE.png'); }
       :root {
-        --letters-top: var(--phone-letters-top, 60px);
-        --search-top: var(--phone-search-top, 105px);
+        --letters-top: var(--phone-letters-top, 90px);
+        --search-top: var(--phone-search-top, 120px);
         --font-top: var(--phone-font-top, 50px);
         --content-top: var(--phone-content-top, 150px);
         --list-font: var(--phone-list-font, var(--list-font));
@@ -172,7 +172,7 @@
 /* ========== Device-specifieke mapping van startgrootte naar --list-font ========== */
 @media (max-width: 820px) {
   :root {
-    --list-font: var(--phone-list-font, 0.70em);
+    --list-font: var(--phone-list-font, 0.80em);
   }
 }
 @media (min-width: 821px) {
@@ -213,7 +213,7 @@
       padding-bottom: 4px;
       background: transparent;
     }
-
+    
 </style>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -249,92 +249,44 @@
     // ===============================
     let allSongs = [], totalCount = 0;
 
-    // Filters state
-    let currentLetter = 'Alles';
-    let currentLang = 'Alle'; // Alle | NL | FR | DU | A (Andere)
+    // Filter state
+    let currentLetter = 'Alles'; // Alles | # | A..Z
+    let currentLang   = 'Alle';  // Alle | NL | FR | DU | A (Andere)
     let currentSearch = '';
 
     function renderFiltered() {
-  let list = allSongs.slice();
+      let list = allSongs.slice();
 
-  // 1) Zoekfilter
-  const q = (currentSearch || '').toLowerCase();
-  if (q) {
-    list = list.filter(s =>
-      (s.uitvoerder || '').toLowerCase().includes(q) ||
-      (s.titel || '').toLowerCase().includes(q)
-    );
-  }
-
-  // 2) Letterfilter
-  if (currentLetter !== 'Alles') {
-    if (currentLetter === '#') {
-      list = list.filter(s => !/^[a-zA-Z]/.test((s.uitvoerder || '')));
-    } else {
-      const L = (currentLetter || '').toUpperCase();
-      list = list.filter(s => (s.uitvoerder || '').toUpperCase().startsWith(L));
-    }
-  }
-
-  // 3) Taalfilter
-  if (currentLang && currentLang !== 'Alle') {
-    if (currentLang === 'A') {
-      list = list.filter(s => (s.taalCode || 'A') === 'A');
-    } else {
-      list = list.filter(s => (s.taalCode || '').toUpperCase() === currentLang);
-    }
-  }
-
-  displaySongs(list);
-}
-// 2) Letterfilter
-  if (currentLetter !== 'Alles') {
-    if (currentLetter === '#') {
-      list = list.filter(s => !/^[a-zA-Z]/.test(s.uitvoerder || ''));
-    } else {
-      const L = (currentLetter || '').toUpperCase();
-      list = list.filter(s => (s.uitvoerder || '').toUpperCase().startsWith(L));
-    }
-  }
-
-  // 3) Taalfilter
-  if (currentLang && currentLang !== 'Alle') {
-    if (currentLang === 'A') {
-      list = list.filter(s => s.taalCode === 'A');
-    } else {
-      list = list.filter(s => s.taalCode === currentLang);
-    }
-  }
-
-  displaySongs(list);
-}
-else {
-          const L = currentLetter.toUpperCase();
-          list = list.filter(s => (s.uitvoerder || '').toUpperCase().startsWith(L));
-        }
-      }
-      // language filter
-      if (currentLang !== 'Alle') {
-        if (currentLang === 'A') {
-          list = list.filter(s => {
-            const t = (s.taal || '').trim().toUpperCase();
-            return t && !['NL','FR','DU'].includes(t);
-          });
-        } else {
-          list = list.filter(s => (s.taal || '').trim().toUpperCase() === currentLang);
-        }
-      }
-      // search filter
-      const q = currentSearch.trim().toLowerCase();
+      // 1) Zoekfilter
+      const q = (currentSearch || '').toLowerCase();
       if (q) {
         list = list.filter(s =>
           (s.uitvoerder || '').toLowerCase().includes(q) ||
           (s.titel || '').toLowerCase().includes(q)
         );
       }
+
+      // 2) Letterfilter
+      if (currentLetter !== 'Alles') {
+        if (currentLetter === '#') {
+          list = list.filter(s => !/^[a-zA-Z]/.test((s.uitvoerder || '')));
+        } else {
+          const L = (currentLetter || '').toUpperCase();
+          list = list.filter(s => (s.uitvoerder || '').toUpperCase().startsWith(L));
+        }
+      }
+
+      // 3) Taalfilter
+      if (currentLang && currentLang !== 'Alle') {
+        if (currentLang === 'A') {
+          list = list.filter(s => (s.taalCode || 'A') === 'A');
+        } else {
+          list = list.filter(s => (s.taalCode || '').toUpperCase() === currentLang);
+        }
+      }
+
       displaySongs(list);
     }
-
 
     function getInitialListFont() {
       const raw = getComputedStyle(document.documentElement).getPropertyValue('--list-font').trim();
@@ -353,15 +305,15 @@ else {
     }
 
     function normalizeLang(val){
-  const t = (val||'').toString().trim().toUpperCase();
-  if(!t) return 'A';
-  if(t.startsWith('NL') || t.includes('NED')) return 'NL';
-  if(t.startsWith('FR') || t.includes('FRA')) return 'FR';
-  if(t==='DU' || t.startsWith('DE') || t.includes('DEUT')) return 'DU';
-  return 'A';
-}
+      const t = (val||'').toString().trim().toUpperCase();
+      if (!t) return 'A';
+      if (t.startsWith('NL') || t.includes('NED')) return 'NL';
+      if (t.startsWith('FR') || t.includes('FRA')) return 'FR';
+      if (t === 'DU' || t.startsWith('DE') || t.includes('DEUT')) return 'DU';
+      return 'A';
+    }
 
-function pick(o, candidates){
+    function pick(o, candidates){
       for(const c of candidates){
         if(o[c]!=null && String(o[c]).trim()!=='') return String(o[c]).trim();
       }
@@ -369,7 +321,7 @@ function pick(o, candidates){
     }
 
     function loadSongs(cacheBust=true){
-      const url = cacheBust ? `songs.csv?ts=1761077697?ts=${Date.now()}` : 'songs.csv?ts=1761077697';
+      const url = cacheBust ? `songs.csv?v=${Date.now()}` : 'songs.csv?v=${Date.now()}';
       Papa.parse(url, {
         download: true, header: true, skipEmptyLines: 'greedy',
         complete: result => {
@@ -386,7 +338,7 @@ function pick(o, candidates){
           renderFiltered();
         },
         error: err => {
-          document.getElementById('song-list').textContent = 'Fout bij laden van songs.csv?ts=1761077697: ' + err.message;
+          document.getElementById('song-list').textContent = 'Fout bij laden van songs.csv?v=${Date.now()}: ' + err.message;
         }
       });
     }
@@ -425,24 +377,21 @@ function pick(o, candidates){
     }
 
     function filterByLanguage(lang){
-  currentLang = lang;
-  renderFiltered();
-}
-function setupLanguageButtons(){
-  const langs = ['Alle','NL','FR','DU','A'];
-  const c = document.getElementById('lang-buttons');
-  if (!c) return;
-  c.innerHTML = '';
-  langs.forEach(L => {
-    const b = document.createElement('button');
-    b.textContent = L;
-    b.addEventListener('click', () => filterByLanguage(L));
-    c.appendChild(b);
-  });
-}
-);
-}
-);
+      currentLang = lang;
+      renderFiltered();
+    }
+
+    function setupLanguageButtons(){
+      const langs = ['Alle','NL','FR','DU','A'];
+      const c = document.getElementById('lang-buttons');
+      if (!c) return;
+      c.innerHTML = '';
+      langs.forEach(L => {
+        const b = document.createElement('button');
+        b.textContent = L;
+        b.addEventListener('click', () => filterByLanguage(L));
+        c.appendChild(b);
+      });
     }
 
     // Live zoeken
