@@ -277,13 +277,15 @@
       }
 
       // 3) Taalfilter
-      if (currentLang && currentLang !== 'Alle') {
-        if (currentLang === 'A') {
-          list = list.filter(s => (s.taalCode || 'A') === 'A');
-        } else {
-          list = list.filter(s => (s.taalCode || '').toUpperCase() === currentLang);
-        }
+    if (activeLang !== "ALL") {
+      if (activeLang === "A") {
+        // Toon enkel liedjes met exact 'A'
+        if (lang !== "A") return false;
+      } else {
+        // Toon enkel als de taal exact overeenkomt
+        if (lang !== activeLang) return false;
       }
+    }
 
       displaySongs(list);
     }
