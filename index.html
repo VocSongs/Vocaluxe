@@ -306,23 +306,25 @@
 
     
 function normalizeLang(val){
-  const t = (val||'').toString().trim().toUpperCase();
+  const t = (val || '').toString().trim().toUpperCase();
 
   // NL (Nederlands)
-  if (t.includes('NEDER')) return 'NL';
+  if (t.includes('NEDER') || t.startsWith('NL')) return 'NL';
 
   // FR (Frans / Français / Francais)
-  if (t.includes('FRANS')) return 'FR';
+  if (t.includes('FRANS') || t.startsWith('FR')) return 'FR';
 
   // DU (Duits / Deutsch / DE)
-  if (t.includes('DUITS')) return 'DU';
+  if (t.includes('DUITS') || t.startsWith('DU') || t.startsWith('DE')) return 'DU';
 
   // A (Andere)
-  if (t.includes('AND')) return 'A';
+  if (t.includes('ANDER')) return 'A';
 
-  // Fallback
-  return 'A';
-}
+  // Leeg of onbekend → return lege string, niet 'A'
+  if (t === '' || t === '-' || t === ' ') return '';
+
+  // Fallback → laat leeg, dan wordt het als “onbekend” beschouwd
+  return '';
 
 function pick(o, candidates){
       for(const c of candidates){
