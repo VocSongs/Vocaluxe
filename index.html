@@ -309,16 +309,16 @@ function normalizeLang(val){
   const t = (val||'').toString().trim().toUpperCase();
 
   // NL (Nederlands)
-  if (t.startsWith('NL') || t.includes('NEDER')) return 'NL';
+  if (t.includes('NEDER')) return 'NL';
 
   // FR (Frans / Français / Francais)
-  if (t.startsWith('FR') || t.includes('FRANS') || t.includes('FRANÇAIS') || t.includes('FRANCAIS')) return 'FR';
+  if (t.includes('FRANS')) return 'FR';
 
   // DU (Duits / Deutsch / DE)
-  if (t === 'DU' || t.startsWith('DU') || t.includes('DUITS') || t.startsWith('DE') || t.includes('DEUT')) return 'DU';
+  if (t.includes('DUITS')) return 'DU';
 
   // A (Andere)
-  if (t.includes('ANDERE')) return 'A';
+  if (t.includes('AND')) return 'A';
 
   // Fallback
   return 'A';
