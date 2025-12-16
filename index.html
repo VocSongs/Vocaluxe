@@ -336,7 +336,7 @@
       }
 
       if (currentLang !== 'Alle') {
-        if (currentLang === 'A') {
+        if (currentLang === 'Overige') {
           list = list.filter(s => s.taalCode === 'A');
         } else {
           list = list.filter(s => s.taalCode === currentLang);
@@ -399,7 +399,7 @@
     }
 
     function setupLanguageButtons(){
-      const langs = ['All','Ned','Fra','Dui','Overige'];
+      const langs = ['Alle','NL','FR','DUI','Overige'];
       const c = document.getElementById('lang-buttons');
       if (!c) return;
       c.innerHTML = '';
